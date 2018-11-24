@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.android.firebase">
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <permission
+        android:name="android.permission.BLUETOOTH"
+        android:label="BLUETOOTH" />
+    <permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity" />
+        <activity android:name=".Main2Activity" />
+        <activity
+            android:name=".First"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".RecordActivity"
+            android:label="Student"/>
+        <activity android:name=".AdminActivity"
+            android:label="Admin"/>
+        <activity android:name=".TeacherActivity"
+            android:label="Teachers"/>
+        <activity android:name=".SubjectActivity"
+            android:label="Subjects"/>
+        <activity android:name=".subjectdialog" />
+        <activity android:name=".TimeTableActivity"
+            android:label="Time Table"/>
+        <activity android:name=".FirstYear" />
+        <activity android:name=".TimeTableDialog" />
+        <activity android:name=".showTimeTableActivity" />
+        <activity android:name=".PeriodActivity"
+            android:label="Time Table"/>
+        <activity android:name=".BlankActivity" />
+        <activity android:name=".TeacherView"
+            android:label="Subjects"/>
+        <activity android:name=".StudentList"
+            android:label="Enrolled Students"/>
+    </application>
+
+</manifest>
