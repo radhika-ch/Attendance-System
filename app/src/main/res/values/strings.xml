@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Firebase</string>
+    <string name="app_name">Daily Attendance</string>
     <string name="first_year">2018</string>
     <string name="second_year">2017</string>
     <string name="third_year">2016</string>
