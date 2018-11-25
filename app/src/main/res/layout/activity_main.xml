@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     tools:background="@drawable/attendance"
     tools:context=".MainActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/colorPrimaryDark">
 
 
     <com.google.android.gms.common.SignInButton

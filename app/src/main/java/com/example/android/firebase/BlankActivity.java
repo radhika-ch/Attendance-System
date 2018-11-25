@@ -72,6 +72,7 @@ public class BlankActivity extends AppCompatActivity {
                     else
                     {
                         Toast.makeText(getApplicationContext(), "You are not a teacher", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(BlankActivity.this, First.class));
                     }
                 }
 

@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".PeriodActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/colorPrimaryDark">
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,19 +18,22 @@
             android:layout_height="wrap_content"
             android:text="START TIME"
             android:id="@+id/start"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:textColor="@color/colorPrimary"/>
         <TextView
             android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:text="ENDTIME"
             android:layout_weight="1"
-            android:id="@+id/end"/>
+            android:id="@+id/end"
+            android:textColor="@color/colorPrimary"/>
         <TextView
             android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:text="SUBJECT CODE"
             android:layout_weight="1"
-            android:id="@+id/subject" />
+            android:id="@+id/subject"
+            android:textColor="@color/colorPrimary"/>
     </LinearLayout>
 
     <RelativeLayout
@@ -55,7 +59,8 @@
         app:backgroundTint="@android:color/darker_gray"
         app:srcCompat="@android:drawable/ic_input_add"
         tools:layout_editor_absoluteX="328dp"
-        tools:layout_editor_absoluteY="455dp" />
+        tools:layout_editor_absoluteY="455dp"
+        android:background="@color/colorPrimary"/>
     </RelativeLayout>
 
 
