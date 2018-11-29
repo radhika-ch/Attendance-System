@@ -54,12 +54,12 @@ public class TeacherView extends AppCompatActivity {
 
         }
 
-        bluetoothAddress = getBluetoothMacAddress();
-        Toast.makeText(getApplicationContext(), bluetoothAddress, Toast.LENGTH_SHORT).show();
-        DatabaseReference myref1 = database.getReference("Bluetooths");
-
-        BluetoothAddress ba = new BluetoothAddress(teacherName, bluetoothAddress);
-        myref1.child(teacherName).setValue(ba);
+//        bluetoothAddress = getBluetoothMacAddress();
+//        Toast.makeText(getApplicationContext(), bluetoothAddress, Toast.LENGTH_SHORT).show();
+//        DatabaseReference myref1 = database.getReference("Bluetooths");
+//
+//        BluetoothAddress ba = new BluetoothAddress(teacherName, bluetoothAddress);
+//        myref1.child(teacherName).setValue(ba);
 
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

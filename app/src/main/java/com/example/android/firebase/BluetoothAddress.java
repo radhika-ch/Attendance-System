@@ -4,7 +4,7 @@ public class BluetoothAddress {
     String address;
     String subjectCode;
 
-    public  void BluetoothAddress()
+    public  BluetoothAddress()
     {
 
     }
