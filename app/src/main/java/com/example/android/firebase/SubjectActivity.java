@@ -97,7 +97,7 @@ public class SubjectActivity extends AppCompatActivity implements SubjectDialog.
 
     }
 
-    public void deleteSubject(Subject subject)
+    public void deleteSubject(final Subject subject)
     {
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
@@ -107,7 +107,99 @@ public class SubjectActivity extends AppCompatActivity implements SubjectDialog.
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                    final Subject s = appleSnapshot.getValue(Subject.class);
+                    String teacherName = s.teacherName;
+//                    Toast.makeText(getApplicationContext(), s.teacherName, Toast.LENGTH_SHORT).show();
                     appleSnapshot.getRef().removeValue();
+
+                    final DatabaseReference myref = FirebaseDatabase.getInstance().getReference("Teachers").child(teacherName);
+
+                    myref.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Teacher t = dataSnapshot.getValue(Teacher.class);
+                            HashMap<String, Integer> subjects = t.subjects;
+                            if(subjects.size() == 1) {
+                                subjects.put("empty", 0);
+                            }
+                            subjects.remove(subject.subjectCode);
+                            t.subjects = subjects;
+                            myref.setValue(t);
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    final DatabaseReference myref1 = FirebaseDatabase.getInstance().getReference("Students").child(s.batch);
+                    myref1.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot studentSnapshot: dataSnapshot.getChildren())
+                            {
+                                Student student = studentSnapshot.getValue(Student.class);
+                                HashMap<String, studentSubject> subjectMap = student.subjectMap;
+                                if(subjectMap.size() == 1)
+                                {
+                                    studentSubject s1 = new studentSubject("empty", 0, 0, 0);
+                                    subjectMap.put("empty", s1);
+                                }
+                                subjectMap.remove(s.subjectCode);
+                                student.subjectMap = subjectMap;
+                                myref1.child(student.studentRollNumber).setValue(student);
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    DatabaseReference myref2 = FirebaseDatabase.getInstance().getReference("Periods");
+                    final DatabaseReference r = myref2.child(s.batch);
+
+                    r.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            for (final DataSnapshot daySnapshot: dataSnapshot.getChildren())
+                            {
+                                r.child(daySnapshot.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        for (DataSnapshot classSnapshot: dataSnapshot.getChildren())
+                                        {
+                                            PeriodClass p = classSnapshot.getValue(PeriodClass.class);
+                                            if((p.subjectCode).equals(s.subjectCode))
+                                            {
+                                                r.child(daySnapshot.getKey()).child(p.subjectCode).removeValue();
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+
                 }
             }
 
@@ -119,10 +211,10 @@ public class SubjectActivity extends AppCompatActivity implements SubjectDialog.
     }
 
 
-    private void saveSubject(final String subjectCode, final String teacherName, String batch)
+    private void saveSubject(final String subjectCode, final String teacherName, final String batch)
     {
 //        String id = myRef.push().getKey();
-        Subject subject = new Subject(subjectCode, teacherName, batch);
+        Subject subject = new Subject(subjectCode, teacherName, batch, 0);
         myRef.child(subjectCode).setValue(subject);
         final DatabaseReference myRef1 = database.getReference("Teachers");
         myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -131,8 +223,12 @@ public class SubjectActivity extends AppCompatActivity implements SubjectDialog.
                 int foundTeacher = 0;
                 for (DataSnapshot teacherSnapshot : dataSnapshot.getChildren()) {
                     Teacher t = teacherSnapshot.getValue(Teacher.class);
-                    Toast.makeText(getApplicationContext(), t.name, Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(getApplicationContext(), t.name, Toast.LENGTH_SHORT).show();
                     if((t.name).equals(teacherName)) {
+                        if(t.subjects.containsKey("empty"))
+                        {
+                            t.subjects.remove("empty");
+                        }
                         t.subjects.put(subjectCode, 0);
                         t.subjects.remove("new");
                         myRef1.child(teacherName).setValue(t);
@@ -149,6 +245,31 @@ public class SubjectActivity extends AppCompatActivity implements SubjectDialog.
                     Teacher t = new Teacher(teacherName, s);
                     myRef1.child(teacherName).setValue(t);
                 }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+//
+        final DatabaseReference myref2 = FirebaseDatabase.getInstance().getReference("Students");
+        DatabaseReference r = myref2.child(batch);
+        r.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot studentSnapshot : dataSnapshot.getChildren())
+                {
+                    Student student = studentSnapshot.getValue(Student.class);
+                    if(student.subjectMap.containsKey("empty"))
+                    {
+                        student.subjectMap.remove("empty");
+                    }
+
+                    student.subjectMap.put(subjectCode, new studentSubject(subjectCode, 0, 0, 0));
+                    myref2.child(batch).child(student.studentRollNumber).setValue(student);
+                }
+
             }
 
             @Override

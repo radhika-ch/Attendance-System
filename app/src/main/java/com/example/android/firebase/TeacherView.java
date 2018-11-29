@@ -1,5 +1,6 @@
 package com.example.android.firebase;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,11 +33,15 @@ public class TeacherView extends AppCompatActivity {
     DatabaseReference myRef = database.getReference("Teachers");
     HashMap<String, Integer> subjects;
     List<String> subjectList;
+    String bluetoothAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher_view);
+
+
+
         listViewTeachers = (ListView) findViewById(R.id.list);
         subjectList = new ArrayList<>();
         Bundle b = getIntent().getExtras();
@@ -46,6 +53,13 @@ public class TeacherView extends AppCompatActivity {
             }
 
         }
+
+        bluetoothAddress = getBluetoothMacAddress();
+        Toast.makeText(getApplicationContext(), bluetoothAddress, Toast.LENGTH_SHORT).show();
+        DatabaseReference myref1 = database.getReference("Bluetooths");
+
+        BluetoothAddress ba = new BluetoothAddress(teacherName, bluetoothAddress);
+        myref1.child(teacherName).setValue(ba);
 
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -88,5 +102,33 @@ public class TeacherView extends AppCompatActivity {
 
 
 
+    }
+
+    private String getBluetoothMacAddress() {
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        String bluetoothMacAddress = "";
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M){
+            try {
+                Field mServiceField = bluetoothAdapter.getClass().getDeclaredField("mService");
+                mServiceField.setAccessible(true);
+
+                Object btManagerService = mServiceField.get(bluetoothAdapter);
+
+                if (btManagerService != null) {
+                    bluetoothMacAddress = (String) btManagerService.getClass().getMethod("getAddress").invoke(btManagerService);
+                }
+            } catch (NoSuchFieldException e) {
+
+            } catch (NoSuchMethodException e) {
+
+            } catch (IllegalAccessException e) {
+
+            } catch (InvocationTargetException e) {
+
+            }
+        } else {
+            bluetoothMacAddress = bluetoothAdapter.getAddress();
+        }
+        return bluetoothMacAddress;
     }
 }

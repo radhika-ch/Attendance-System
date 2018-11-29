@@ -1,11 +1,16 @@
 package com.example.android.firebase;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TabHost;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -14,6 +19,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,6 +37,14 @@ public class StudentList extends AppCompatActivity {
     String batch;
     ListView studentView;
     Button mail;
+    Button plus;
+    TextView number;
+    Button start;
+    Button minus;
+    int total;
+
+    String bluetoothAddress;
+    BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +60,8 @@ public class StudentList extends AppCompatActivity {
             }
 
         }
+
+
         myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -79,6 +96,122 @@ public class StudentList extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+        plus = (Button) findViewById(R.id.plus);
+        number = (TextView) findViewById(R.id.number);
+        start = (Button) findViewById(R.id.start);
+        minus = (Button) findViewById(R.id.minus);
+
+        plus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String n = number.getText().toString();
+                number.setText(((Integer.parseInt(n))+1) + "");
+            }
+        });
+
+        minus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String n = number.getText().toString();
+                number.setText(((Integer.parseInt(n))-1) + "");
+            }
+        });
+
+        start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(number.getText().toString().equals("0"))
+                {
+                    Toast.makeText(getApplicationContext(), "Please add the number of classes", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    if (!mBluetoothAdapter.isEnabled()) {
+                        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                        startActivityForResult(enableBtIntent, 1);
+                        SystemClock.sleep(4000);
+                    }
+
+                    if(mBluetoothAdapter.isEnabled()) {
+                        bluetoothAddress = getBluetoothMacAddress();
+                        Toast.makeText(getApplicationContext(), bluetoothAddress, Toast.LENGTH_SHORT).show();
+                        DatabaseReference myref1 = database.getReference("Bluetooths");
+
+                        BluetoothAddress ba = new BluetoothAddress(subjectCode, bluetoothAddress);
+                        myref1.child(subjectCode).setValue(ba);
+                        Toast.makeText(getApplicationContext(), "System open for attendance responses", Toast.LENGTH_SHORT).show();
+                        final DatabaseReference myref = FirebaseDatabase.getInstance().getReference("Subjects");
+                        myref.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for (DataSnapshot subjectSnapshot : dataSnapshot.getChildren()) {
+                                    if (subjectSnapshot.getKey().equals(subjectCode)) {
+                                        Subject s = subjectSnapshot.getValue(Subject.class);
+                                        s.total = s.total + Integer.parseInt(number.getText().toString());
+                                        myref.child(subjectCode).setValue(s);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+                        DatabaseReference dr = FirebaseDatabase.getInstance().getReference("Subjects");
+                        dr.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                for (DataSnapshot studentSnapshot : dataSnapshot.getChildren()) {
+                                    Subject s = studentSnapshot.getValue(Subject.class);
+                                    if ((s.subjectCode).equals(subjectCode)) {
+                                        batch = s.batch;
+                                        total = s.total;
+
+                                        break;
+                                    }
+                                }
+                                final DatabaseReference myref2 = FirebaseDatabase.getInstance().getReference("Students");
+                                myref2.child(batch).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        for(DataSnapshot ds : dataSnapshot.getChildren())
+                                        {
+                                            Student student = ds.getValue(Student.class);
+                                            studentSubject ss = student.subjectMap.get(subjectCode);
+                                            ss.total = ss.total + Integer.parseInt(number.getText().toString());
+                                            student.subjectMap.put(subjectCode, ss);
+                                            myref2.child(batch).child(student.studentRollNumber).setValue(student);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+
+                    }
+
+                    else {
+                        Toast.makeText(getApplicationContext(), "Please turn the bluetooth on", Toast.LENGTH_SHORT).show();
+                    }
+                }
 
             }
         });
@@ -162,5 +295,33 @@ public class StudentList extends AppCompatActivity {
 
             }
         });
+    }
+
+    private String getBluetoothMacAddress() {
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        String bluetoothMacAddress = "";
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M){
+            try {
+                Field mServiceField = bluetoothAdapter.getClass().getDeclaredField("mService");
+                mServiceField.setAccessible(true);
+
+                Object btManagerService = mServiceField.get(bluetoothAdapter);
+
+                if (btManagerService != null) {
+                    bluetoothMacAddress = (String) btManagerService.getClass().getMethod("getAddress").invoke(btManagerService);
+                }
+            } catch (NoSuchFieldException e) {
+
+            } catch (NoSuchMethodException e) {
+
+            } catch (IllegalAccessException e) {
+
+            } catch (InvocationTargetException e) {
+
+            }
+        } else {
+            bluetoothMacAddress = bluetoothAdapter.getAddress();
+        }
+        return bluetoothMacAddress;
     }
 }

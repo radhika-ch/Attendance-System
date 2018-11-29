@@ -5,6 +5,7 @@ public class Subject {
     String subjectCode;
     String teacherName;
     String batch;
+    int total;
 
 
     public  Subject()
@@ -24,10 +25,16 @@ public class Subject {
         return teacherName;
     }
 
-    public  Subject(String subjectCode, String teacherName, String batch){
+    public int getTotal()
+    {
+        return total;
+    }
+
+    public  Subject(String subjectCode, String teacherName, String batch, int total){
         this.subjectCode = subjectCode;
         this.teacherName = teacherName;
         this.batch = batch;
+        this.total = total;
     }
 
 
