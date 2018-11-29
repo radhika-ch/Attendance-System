@@ -718,7 +718,7 @@ public class RecordActivity extends AppCompatActivity {
 
                     if(found == 0)
                     {
-                        DatabaseReference sub = FirebaseDatabase.getInstance().getReference("Subjects");
+                        final DatabaseReference sub = FirebaseDatabase.getInstance().getReference("Subjects");
 
 
                         sub.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -730,19 +730,19 @@ public class RecordActivity extends AppCompatActivity {
                                 {
 
                                     Subject subject = subjectSnapshot.getValue(Subject.class);
+                                    Toast.makeText(getApplicationContext(), subject.subjectCode, Toast.LENGTH_SHORT).show();
                                     String b = subject.batch;
                                     if(b.equals(batch))
                                     {
                                         subjects.add(subject.subjectCode);
                                         key = subject.subjectCode;
-                                        value = new studentSubject(key, 0, 0, 0);
+                                        Toast.makeText(getApplicationContext(), subject.subjectCode + subject.total + "", Toast.LENGTH_SHORT).show();
+
+                                        value = new studentSubject(key, 0, subject.total, 0, 0);
                                         subjectMap.put(key, value);
-//                            Toast.makeText(getApplicationContext(), subjectMap.get(value.subjectCode).subjectCode, Toast.LENGTH_SHORT).show();
                                     }
-//                        Toast.makeText(getApplicationContext(), subjectMap.get(value.subjectCode).subjectCode, Toast.LENGTH_SHORT).show();
 
                                 }
-//                    Toast.makeText(getApplicationContext(), subjectMap.get(value.subjectCode).subjectCode, Toast.LENGTH_SHORT).show();
                                 Student student = new Student(personName, personEmail, rollNumber, batch, subjectMap);
 
                                 myRef.child(batch).child(rollNumber).setValue(student);
@@ -941,15 +941,23 @@ public class RecordActivity extends AppCompatActivity {
                                                 if(student.studentRollNumber.equals(rollNumber)) {
                                                     HashMap<String, studentSubject> subjectMap = student.subjectMap;
                                                     studentSubject s = subjectMap.get(currentSubject);
+                                                    if(s.currentNumber == 0)
+                                                    {
+                                                        Toast.makeText(getApplicationContext(), "You do not have a class right now", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                    else {
 
-                                                    s.present = s.present + 1;
-                                                    s.percentage = ((float)s.present/(float)s.total)*100;
-                                                    subjectMap.put(s.subjectCode, s);
-                                                    student.subjectMap = subjectMap;
+                                                        s.present = s.present + s.currentNumber;
+                                                        s.percentage = ((float) s.present / (float) s.total) * 100;
+                                                        subjectMap.put(s.subjectCode, s);
+                                                        student.subjectMap = subjectMap;
+                                                        student.subjectMap.get(subjectCode).currentNumber = 0;
 
-                                        // studentSnapshot.getValue(Student.class).subjectMap.get(currentSubject).present = studentSnapshot.getValue(Student.class).subjectMap.get(currentSubject).present + 1;
-                                                    FirebaseDatabase.getInstance().getReference("Students").child(batch).child(student.studentRollNumber).setValue(student);
-                                                    Toast.makeText(getApplicationContext(), "Attendance for " + currentSubject + " recorded", Toast.LENGTH_SHORT).show();
+                                                        // studentSnapshot.getValue(Student.class).subjectMap.get(currentSubject).present = studentSnapshot.getValue(Student.class).subjectMap.get(currentSubject).present + 1;
+                                                        FirebaseDatabase.getInstance().getReference("Students").child(batch).child(student.studentRollNumber).setValue(student);
+                                                        student.subjectMap.get(subjectCode).currentNumber = 0;
+                                                        Toast.makeText(getApplicationContext(), "Attendance for " + currentSubject + " recorded", Toast.LENGTH_SHORT).show();
+                                                    }
                                     }
 
 

@@ -42,6 +42,7 @@ public class StudentList extends AppCompatActivity {
     Button start;
     Button minus;
     int total;
+    String num;
 
     String bluetoothAddress;
     BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -106,6 +107,7 @@ public class StudentList extends AppCompatActivity {
         start = (Button) findViewById(R.id.start);
         minus = (Button) findViewById(R.id.minus);
 
+
         plus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,7 +120,12 @@ public class StudentList extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String n = number.getText().toString();
-                number.setText(((Integer.parseInt(n))-1) + "");
+                if(Integer.parseInt(n) <= 0)
+                {
+                    Toast.makeText(getApplicationContext(), "Number of classes cannot be negative", Toast.LENGTH_LONG).show();
+                }
+                else
+                    number.setText(((Integer.parseInt(n))-1) + "");
             }
         });
 
@@ -186,9 +193,12 @@ public class StudentList extends AppCompatActivity {
                                             Student student = ds.getValue(Student.class);
                                             studentSubject ss = student.subjectMap.get(subjectCode);
                                             ss.total = ss.total + Integer.parseInt(number.getText().toString());
+                                            ss.currentNumber = Integer.parseInt(number.getText().toString());
                                             student.subjectMap.put(subjectCode, ss);
                                             myref2.child(batch).child(student.studentRollNumber).setValue(student);
                                         }
+
+                                        number.setText("0");
                                     }
 
                                     @Override
@@ -204,6 +214,8 @@ public class StudentList extends AppCompatActivity {
 
                             }
                         });
+
+
 
 
                     }

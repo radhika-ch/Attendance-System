@@ -144,7 +144,7 @@ public class SubjectActivity extends AppCompatActivity implements SubjectDialog.
                                 HashMap<String, studentSubject> subjectMap = student.subjectMap;
                                 if(subjectMap.size() == 1)
                                 {
-                                    studentSubject s1 = new studentSubject("empty", 0, 0, 0);
+                                    studentSubject s1 = new studentSubject("empty", 0, 0, 0, 0);
                                     subjectMap.put("empty", s1);
                                 }
                                 subjectMap.remove(s.subjectCode);
@@ -266,7 +266,7 @@ public class SubjectActivity extends AppCompatActivity implements SubjectDialog.
                         student.subjectMap.remove("empty");
                     }
 
-                    student.subjectMap.put(subjectCode, new studentSubject(subjectCode, 0, 0, 0));
+                    student.subjectMap.put(subjectCode, new studentSubject(subjectCode, 0, 0, 0, 0));
                     myref2.child(batch).child(student.studentRollNumber).setValue(student);
                 }
 
