@@ -1,5 +1,3 @@
-
-
 package com.example.android.firebase;
 
 import android.bluetooth.BluetoothAdapter;
@@ -58,6 +56,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -107,6 +106,11 @@ public class RecordActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth;
     FirebaseAuth.AuthStateListener mAuthListener;
+    ArrayList<String> subject = new ArrayList<String>();
+    ArrayList<Integer> start = new ArrayList<Integer>();
+    ArrayList<Integer> end = new ArrayList<Integer>();
+    int sTime;
+    int eTime;
 
     @Override
     protected void onStart() {
@@ -312,231 +316,203 @@ public class RecordActivity extends AppCompatActivity {
 //                if(device.getAddress().equals("98:D3:51:F5:C1:D7"))
                 //{
 //                    Toast.makeText(getApplicationContext(), "Found device", Toast.LENGTH_SHORT).show();
-                    Calendar calendar = Calendar.getInstance();
-                    SimpleDateFormat mdformat = new SimpleDateFormat("hh:mm a");
-                    String strTime =  mdformat.format(calendar.getTime());
-                    String hour = strTime.substring(0, 2);
-                    String minute = strTime.substring(3, 5);
-                    String AMPM = strTime.substring(6, 8);
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat mdformat = new SimpleDateFormat("hh:mm a");
+                final String strTime =  mdformat.format(calendar.getTime());
+                String hour = strTime.substring(0, 2);
+                String minute = strTime.substring(3, 5);
+                String AMPM = strTime.substring(6, 8);
 //
 
 
-                    calendar = Calendar.getInstance();
-                    Date date = calendar.getTime();
-                    String day = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(date.getTime());
-                    Toast.makeText(getApplicationContext(), day, Toast.LENGTH_SHORT).show();
+                calendar = Calendar.getInstance();
+                Date date = calendar.getTime();
+                String day = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(date.getTime());
+                Toast.makeText(getApplicationContext(), day, Toast.LENGTH_SHORT).show();
 
 
 
 
-                    final int mins;
-                    int h = Integer.parseInt(hour);
-                    int m = Integer.parseInt(minute);
+                final int mins;
+                int h = Integer.parseInt(hour);
+                int m = Integer.parseInt(minute);
 
-                    if(AMPM.equals("PM"))
+                if(AMPM.equals("PM"))
+                {
+                    mins = (h + 12)*60 + m;
+                }
+
+                else
+                {
+                    if(h == 12)
                     {
-                        mins = (h + 12)*60 + m;
+                        h = 0;
                     }
+                    mins = (h*60) + m;
+                }
+                String s = Integer.toString(mins);
 
-                    else
-                    {
-                        if(h == 12)
-                        {
-                            h = 0;
-                        }
-                        mins = (h*60) + m;
-                    }
-                    String s = Integer.toString(mins);
+                retrieveDatabase.child(batch).child(day).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot periodSnapshot : dataSnapshot.getChildren()) {
+                            //  Toast.makeText(getApplicationContext(), "KJ", Toast.LENGTH_SHORT).show();
 
-                    retrieveDatabase.child(batch).child(day).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for(DataSnapshot periodSnapshot : dataSnapshot.getChildren())
-                            {
-                              //  Toast.makeText(getApplicationContext(), "KJ", Toast.LENGTH_SHORT).show();
+                            PeriodClass period = periodSnapshot.getValue(PeriodClass.class);
+                            subjectCode = period.subjectCode;
+                            String startTime = period.startTime;
+                            String endTime = period.endTime;
 
-                                PeriodClass period = periodSnapshot.getValue(PeriodClass.class);
-                                subjectCode = period.subjectCode;
-                                String startTime = period.startTime;
-                                String endTime = period.endTime;
+                            //Toast.makeText(getApplicationContext(), "Subject is" + subjectCode, Toast.LENGTH_SHORT).show();
 
-                                String startHour = startTime.substring(0, 2);
-                                String startMinute = startTime.substring(3, 5);
-                                String startAMPM = startTime.substring(6, 8);
-                                int startMins;
 
-                                String endHour = endTime.substring(0, 2);
-                                String endMinute = endTime.substring(3, 5);
-                                String endAMPM = endTime.substring(6, 8);
-                                int endMins;
+                            String startHour = startTime.substring(0, 2);
+                            String startMinute = startTime.substring(3, 5);
+                            String startAMPM = startTime.substring(6, 8);
+                            int startMins;
 
-                                int h1 = Integer.parseInt(startHour);
-                                int m1 = Integer.parseInt(startMinute);
+                            String endHour = endTime.substring(0, 2);
+                            String endMinute = endTime.substring(3, 5);
+                            String endAMPM = endTime.substring(6, 8);
+                            int endMins;
 
-                                if(startAMPM.equals("PM"))
-                                {
-                                    startMins = (h1 + 12)*60 + m1;
-                                }
+                            int h1 = Integer.parseInt(startHour);
+                            int m1 = Integer.parseInt(startMinute);
 
-                                else
-                                if(h1 == 12)
-                                {
+                            if (startAMPM.equals("PM")) {
+                                startMins = (h1 + 12) * 60 + m1;
+                            } else {
+                                if (h1 == 12) {
                                     h1 = 0;
                                 }
-                                {
-                                    startMins = (h1*60) + m1;
-                                }
-
-                                h1 = Integer.parseInt(endHour);
-                                m1 = Integer.parseInt(endMinute);
-
-                                if(endAMPM.equals("PM"))
-                                {
-                                    endMins = (h1 + 12)*60 + m1;
-                                }
-
-                                else
-                                {
-                                    if(h1 == 12)
-                                    {
-                                        h1 = 0;
-                                    }
-                                    endMins = (h1*60) + m1;
-                                }
-
-                              //  Toast.makeText(getApplicationContext(), mins + " " + startMins + " " + endMins, Toast.LENGTH_SHORT).show();
-
-                                if(mins >= startMins && mins <= endMins)
-                                {
-//                                    Toast.makeText(getApplicationContext(), "Period found: "+subjectCode, Toast.LENGTH_SHORT).show();
-                                    DatabaseReference bluetoothref = FirebaseDatabase.getInstance().getReference("Bluetooths");
-                                    bluetoothref.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                            for(DataSnapshot bs : dataSnapshot.getChildren())
-                                            {
-                                                //Toast.makeText(getApplicationContext(), bs.getKey(), Toast.LENGTH_SHORT).show();
-                                                BluetoothAddress ba = bs.getValue(BluetoothAddress.class);
-                                                if(ba.subjectCode.equals(subjectCode)) {
-                                                    String address = ba.address;
-                                                    if (device.getAddress().equals(address)) {
-                                                        //Toast.makeText(getApplicationContext(), "FOUNDDD", Toast.LENGTH_SHORT).show();
-                                                        currentSubject = subjectCode;
-
-                                                        retrieveDatabaseStudent.child(batch).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                            @Override
-                                                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                                                for(DataSnapshot studentSnapshot : dataSnapshot.getChildren())
-                                                                {
-                                                                    Student student= studentSnapshot.getValue(Student.class);
-                                                                    if(student.studentRollNumber.equals(rollNumber)) {
-                                                                        HashMap<String, studentSubject> subjectMap = student.subjectMap;
-                                                                        studentSubject s = subjectMap.get(currentSubject);
-                                                                        Toast.makeText(getApplicationContext(), s.currentNumber + "", Toast.LENGTH_SHORT).show();
-                                                                        if(s.currentNumber == 0)
-                                                                        {
-                                                                            Toast.makeText(getApplicationContext(), "You cannot mark your attendance right now", Toast.LENGTH_SHORT).show();
-                                                                        }
-                                                                        else {
-
-                                                                            s.present = s.present + s.currentNumber;
-                                                                            s.percentage = ((float) s.present / (float) s.total) * 100;
-                                                                            subjectMap.put(s.subjectCode, s);
-                                                                            student.subjectMap = subjectMap;
-                                                                            student.subjectMap.get(subjectCode).currentNumber = 0;
-
-                                                                            // studentSnapshot.getValue(Student.class).subjectMap.get(currentSubject).present = studentSnapshot.getValue(Student.class).subjectMap.get(currentSubject).present + 1;
-                                                                            FirebaseDatabase.getInstance().getReference("Students").child(batch).child(student.studentRollNumber).setValue(student);
-                                                                            student.subjectMap.get(subjectCode).currentNumber = 0;
-                                                                            Toast.makeText(getApplicationContext(), "Attendance for " + currentSubject + " recorded", Toast.LENGTH_SHORT).show();
-                                                                        }
-                                                                    }
-
-
-                                                                }
-
-                                                            }
-                                                            @Override
-                                                            public void onCancelled(DatabaseError databaseError) {
-                                                                Toast.makeText(getApplicationContext(), "FAIL", Toast.LENGTH_SHORT).show();
-
-                                                            }
-                                                        });
-                                                    }
-
-                                                    else
-                                                    {
-                                                        Toast.makeText(getApplicationContext(), "You are not within the bluetooth range of your teacher's device", Toast.LENGTH_SHORT).show();
-                                                    }
-                                                    break;
-                                                }
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-
-                                        }
-                                    });
-//                                    currentSubject = subjectCode;
-//
-//                                    retrieveDatabaseStudent.child(batch).addListenerForSingleValueEvent(new ValueEventListener() {
-//                                        @Override
-//                                        public void onDataChange(DataSnapshot dataSnapshot) {
-//                                            for(DataSnapshot studentSnapshot : dataSnapshot.getChildren())
-//                                            {
-//                                                Student student= studentSnapshot.getValue(Student.class);
-//                                                if(student.studentRollNumber.equals(rollNumber)) {
-//                                                    HashMap<String, studentSubject> subjectMap = student.subjectMap;
-//                                                    studentSubject s = subjectMap.get(currentSubject);
-//                                                    if(s.currentNumber == 0)
-//                                                    {
-//                                                        Toast.makeText(getApplicationContext(), "You do not have a class right now", Toast.LENGTH_SHORT).show();
-//                                                    }
-//                                                    else {
-//
-//                                                        s.present = s.present + s.currentNumber;
-//                                                        s.percentage = ((float) s.present / (float) s.total) * 100;
-//                                                        subjectMap.put(s.subjectCode, s);
-//                                                        student.subjectMap = subjectMap;
-//                                                        student.subjectMap.get(subjectCode).currentNumber = 0;
-//
-//                                                        // studentSnapshot.getValue(Student.class).subjectMap.get(currentSubject).present = studentSnapshot.getValue(Student.class).subjectMap.get(currentSubject).present + 1;
-//                                                        FirebaseDatabase.getInstance().getReference("Students").child(batch).child(student.studentRollNumber).setValue(student);
-//                                                        student.subjectMap.get(subjectCode).currentNumber = 0;
-//                                                        Toast.makeText(getApplicationContext(), "Attendance for " + currentSubject + " recorded", Toast.LENGTH_SHORT).show();
-//                                                    }
-//                                    }
-//
-//
-//                                }
-//
-//                            }
-//                                        @Override
-//                                        public void onCancelled(DatabaseError databaseError) {
-//                                            Toast.makeText(getApplicationContext(), "FAIL", Toast.LENGTH_SHORT).show();
-//
-//                                        }
-//                                    });
-                                }
-
-
-
-
-
+                                startMins = (h1 * 60) + m1;
                             }
 
+
+                            h1 = Integer.parseInt(endHour);
+                            m1 = Integer.parseInt(endMinute);
+
+                            if (endAMPM.equals("PM")) {
+                                endMins = (h1 + 12) * 60 + m1;
+                            } else {
+                                if (h1 == 12) {
+                                    h1 = 0;
+                                }
+                                endMins = (h1 * 60) + m1;
+                            }
+                            subject.add(subjectCode);
+                            start.add(startMins);
+                            end.add(endMins);
+                            Toast.makeText(getApplicationContext(), startMins + " " + mins + " " + endMins, Toast.LENGTH_LONG).show();
+
                         }
+                        for(int i=0; i<subject.size(); i++)
+                        {
+                            Toast.makeText(getApplicationContext(), subject.get(i), Toast.LENGTH_LONG).show();
 
+                            if(start.get(i) <= mins && end.get(i) >=  mins)
+                            {
+                                subjectCode = subject.get(i);
+                                sTime = start.get(i);
+                                eTime = end.get(i);
+                                Toast.makeText(getApplicationContext(), subject.get(i), Toast.LENGTH_LONG).show();
+                                break;
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
+                            }
                         }
-                    });
-                    inProximity = 1;
-                    mBTAdapter.cancelDiscovery();
-               // }
+                        //subjectCode = cs;
+                       // Toast.makeText(getApplicationContext(), mins + " " + startMins + " " + endMins, Toast.LENGTH_SHORT).show();
+//
+//                            if(mins >= startMins && mins <= endMins)
+//                            {
+//                                Toast.makeText(getApplicationContext(), "Period found: "+subjectCode, Toast.LENGTH_SHORT).show();
+                                DatabaseReference bluetoothref = FirebaseDatabase.getInstance().getReference("Bluetooths");
+                                bluetoothref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        for(DataSnapshot bs : dataSnapshot.getChildren())
+                                        {
+                                            BluetoothAddress ba = bs.getValue(BluetoothAddress.class);
+                                            Toast.makeText(getApplicationContext(), "Subject is" + ba.subjectCode, Toast.LENGTH_SHORT).show();
+
+                                            if(ba.subjectCode.equals(subjectCode)) {
+                                                String address = ba.address;
+                                                Toast.makeText(getApplicationContext(), subjectCode + address, Toast.LENGTH_SHORT).show();
+
+                                                if (device.getAddress().equals(address)) {
+                                                    //Toast.makeText(getApplicationContext(), "FOUNDDD", Toast.LENGTH_SHORT).show();
+
+                                                    currentSubject = subjectCode;
+
+                                                    retrieveDatabaseStudent.child(batch).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                                            for(DataSnapshot studentSnapshot : dataSnapshot.getChildren())
+                                                            {
+                                                                Student student= studentSnapshot.getValue(Student.class);
+                                                                if(student.studentRollNumber.equals(rollNumber)) {
+                                                                    HashMap<String, studentSubject> subjectMap = student.subjectMap;
+                                                                    studentSubject s = subjectMap.get(currentSubject);
+                                                                    Toast.makeText(getApplicationContext(), s.currentNumber + "", Toast.LENGTH_SHORT).show();
+                                                                    if(s.currentNumber == 0)
+                                                                    {
+                                                                        Toast.makeText(getApplicationContext(), "You cannot mark your attendance right now", Toast.LENGTH_SHORT).show();
+                                                                    }
+                                                                    else {
+
+                                                                        s.present = s.present + s.currentNumber;
+                                                                        s.percentage = ((float) s.present / (float) s.total) * 100;
+                                                                        subjectMap.put(s.subjectCode, s);
+                                                                        student.subjectMap = subjectMap;
+                                                                        student.subjectMap.get(subjectCode).currentNumber = 0;
+
+                                                                        // studentSnapshot.getValue(Student.class).subjectMap.get(currentSubject).present = studentSnapshot.getValue(Student.class).subjectMap.get(currentSubject).present + 1;
+                                                                        FirebaseDatabase.getInstance().getReference("Students").child(batch).child(student.studentRollNumber).setValue(student);
+                                                                        student.subjectMap.get(subjectCode).currentNumber = 0;
+                                                                        Toast.makeText(getApplicationContext(), "Attendance for " + currentSubject + " recorded", Toast.LENGTH_SHORT).show();
+                                                                    }
+                                                                }
+
+
+                                                            }
+
+                                                        }
+                                                        @Override
+                                                        public void onCancelled(DatabaseError databaseError) {
+                                                            Toast.makeText(getApplicationContext(), "FAIL", Toast.LENGTH_SHORT).show();
+
+                                                        }
+                                                    });
+                                                }
+
+                                                else
+                                                {
+                                                    Toast.makeText(getApplicationContext(), "You are not within the bluetooth range of your teacher's device", Toast.LENGTH_SHORT).show();
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                    }
+
+//
+//
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+                inProximity = 1;
+                mBTAdapter.cancelDiscovery();
+//                 }
 
             }
 

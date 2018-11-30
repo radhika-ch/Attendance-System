@@ -3,6 +3,7 @@ package com.example.android.firebase;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.SystemClock;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class StudentList extends AppCompatActivity {
 
@@ -43,6 +45,7 @@ public class StudentList extends AppCompatActivity {
     Button minus;
     int total;
     String num;
+    Button stop;
 
     String bluetoothAddress;
     BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -52,6 +55,9 @@ public class StudentList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_list);
         studentView = (ListView) findViewById(R.id.list);
+        stop = (Button) findViewById(R.id.end);
+
+
 
         Bundle b = getIntent().getExtras();
 
@@ -61,6 +67,8 @@ public class StudentList extends AppCompatActivity {
             }
 
         }
+
+
 
 
         myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -77,12 +85,12 @@ public class StudentList extends AppCompatActivity {
                                 for (DataSnapshot studentSnapshot : dataSnapshot.getChildren()) {
                                     Student student = studentSnapshot.getValue(Student.class);
                                     if ((student.batch).equals(batch)) {
-                                        students.add(student);
+                                       // students.add(student);
                                     }
                                 }
 
-                                StudentListAdapter adapter = new StudentListAdapter(StudentList.this, students);
-                                studentView.setAdapter(adapter);
+//                                StudentListAdapter adapter = new StudentListAdapter(StudentList.this, students);
+//                                studentView.setAdapter(adapter);
                             }
 
                             @Override
@@ -129,6 +137,57 @@ public class StudentList extends AppCompatActivity {
             }
         });
 
+        stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mBluetoothAdapter.isEnabled()) {
+                    mBluetoothAdapter.disable();
+                }
+
+//                Intent i = new Intent(StudentList.this, CheckProxy.class);
+//                i.putExtra("subject", subjectCode);
+//                i.putExtra("number", number.getText().toString());
+//                startActivity(i);
+
+
+                DatabaseReference d = FirebaseDatabase.getInstance().getReference("Students");
+                d.child(batch).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        int max = 2;
+                        int min = 1;
+                        int random = new Random().nextInt((max - min) + 1) + min;
+                        Toast.makeText(getApplicationContext(), random+"", Toast.LENGTH_SHORT).show();
+
+                        for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren())
+                        {
+                            if(random > 0)
+                            {
+                                final int random1 = new Random().nextInt((1 - 0) + 1) + 0;
+                                if(random1 == 1)
+                                {
+                                  students.add(dataSnapshot1.getValue(Student.class));
+                                  random = random -1;
+                                }
+                            }
+                        }
+
+                        StudentListAdapter adapter = new StudentListAdapter(StudentList.this, students);
+                        studentView.setAdapter(adapter);
+//                        students.clear();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+
+            }
+        });
+
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,7 +204,7 @@ public class StudentList extends AppCompatActivity {
 
                     if(mBluetoothAdapter.isEnabled()) {
                         bluetoothAddress = getBluetoothMacAddress();
-                        Toast.makeText(getApplicationContext(), bluetoothAddress, Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(getApplicationContext(), bluetoothAddress, Toast.LENGTH_SHORT).show();
                         DatabaseReference myref1 = database.getReference("Bluetooths");
 
                         BluetoothAddress ba = new BluetoothAddress(subjectCode, bluetoothAddress);

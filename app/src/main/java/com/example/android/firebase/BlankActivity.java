@@ -42,7 +42,7 @@ public class BlankActivity extends AppCompatActivity {
         }
 
         if(userType.equals("admin")) {
-            if (email.equals("radhika12chandak@gmail.com")) {
+            if (email.equals("radhika12chandak@gmail.com") || email.equals("meharanjan@gmail.com")) {
                 Intent i = new Intent(BlankActivity.this, AdminActivity.class);
                 startActivity(i);
                 finish();

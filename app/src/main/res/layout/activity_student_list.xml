@@ -32,8 +32,15 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Start Attendance"
+            android:text="Start"
             android:id="@+id/start"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stop Attendance"
+            android:id="@+id/end"/>
+
     </LinearLayout>
 
     <ListView

@@ -5,6 +5,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
@@ -31,6 +33,7 @@ public class SubjectActivity extends AppCompatActivity implements SubjectDialog.
     DatabaseReference retrieveDatabase = FirebaseDatabase.getInstance().getReference("Subjects");
     ListView listViewSubjects;
     List<Subject> subjectList;
+    int temp = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,7 @@ public class SubjectActivity extends AppCompatActivity implements SubjectDialog.
 
             }
         });
+        registerForContextMenu(listViewSubjects);
 
     }
     public  void openDialog()
@@ -68,12 +72,16 @@ public class SubjectActivity extends AppCompatActivity implements SubjectDialog.
                 }
                 SubjectList adapter = new SubjectList(SubjectActivity.this, subjectList);
                 listViewSubjects.setAdapter(adapter);
+
                 listViewSubjects.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        temp = 0;
                         Subject subject = subjectList.get(i);
                         subject.getSubjectCode();
-                        deleteSubject(subject);
+
+                       // Toast.makeText(getApplicationContext(), listViewSubjects.getChildAt(i).findViewById(R.id.subject).toString(), Toast.LENGTH_SHORT).show();
+
                     }
                 });
             }
@@ -85,7 +93,29 @@ public class SubjectActivity extends AppCompatActivity implements SubjectDialog.
         });
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.deleditmenu, menu);
+    }
 
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+
+        switch (item.getItemId())
+        {
+            case R.id.del :
+                Subject s = subjectList.get(info.position);
+                deleteSubject(s);
+                return  true;
+            default:
+                return super.onContextItemSelected(item);
+
+        }
+
+    }
 
     @Override
     public void sendText(String subjectCode, String teacherName, String batch) {

@@ -54,8 +54,8 @@ public class TeacherView extends AppCompatActivity {
 
         }
 
-//        bluetoothAddress = getBluetoothMacAddress();
-//        Toast.makeText(getApplicationContext(), bluetoothAddress, Toast.LENGTH_SHORT).show();
+        bluetoothAddress = getBluetoothMacAddress();
+        Toast.makeText(getApplicationContext(), bluetoothAddress, Toast.LENGTH_SHORT).show();
 //        DatabaseReference myref1 = database.getReference("Bluetooths");
 //
 //        BluetoothAddress ba = new BluetoothAddress(teacherName, bluetoothAddress);
