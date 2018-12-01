@@ -5,6 +5,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -53,6 +55,8 @@ public class TeacherActivity extends AppCompatActivity implements TeacherDialog.
             }
         });
 
+        registerForContextMenu(listViewTeachers);
+
     }
     public  void openDialog()
     {
@@ -80,7 +84,7 @@ public class TeacherActivity extends AppCompatActivity implements TeacherDialog.
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                         Teacher teacher = teacherList.get(i);
                         teacher.getName();
-                        deleteTeacher(teacher);
+                       // deleteTeacher(teacher);
                     }
                 });
             }
@@ -132,6 +136,30 @@ public class TeacherActivity extends AppCompatActivity implements TeacherDialog.
         Teacher teacher = new Teacher(teacherName, subjects);
 //        String t = teacherName;
         myRef.child(teacherName).setValue(teacher);
+
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.deleditmenu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+
+        switch (item.getItemId())
+        {
+            case R.id.del :
+                Teacher s = teacherList.get(info.position);
+                deleteTeacher(s);
+                return  true;
+            default:
+                return super.onContextItemSelected(item);
+
+        }
 
     }
 }

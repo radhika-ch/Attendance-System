@@ -440,7 +440,7 @@ public class RecordActivity extends AppCompatActivity {
                                                 Toast.makeText(getApplicationContext(), subjectCode + address, Toast.LENGTH_SHORT).show();
 
                                                 if (device.getAddress().equals(address)) {
-                                                    //Toast.makeText(getApplicationContext(), "FOUNDDD", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(getApplicationContext(), "FOUNDDD", Toast.LENGTH_SHORT).show();
 
                                                     currentSubject = subjectCode;
 
@@ -483,6 +483,7 @@ public class RecordActivity extends AppCompatActivity {
 
                                                         }
                                                     });
+                                                    mBTAdapter.cancelDiscovery();
                                                 }
 
                                                 else
@@ -511,7 +512,7 @@ public class RecordActivity extends AppCompatActivity {
                     }
                 });
                 inProximity = 1;
-                mBTAdapter.cancelDiscovery();
+               // mBTAdapter.cancelDiscovery();
 //                 }
 
             }

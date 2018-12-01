@@ -49,10 +49,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"></ListView>
 
+
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Send alert mail to attendance defficient students"
+        android:text="Send alert mail to attendance deficient students"
         android:id="@+id/mail"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="10dp"/>

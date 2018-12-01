@@ -4,6 +4,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -18,6 +20,8 @@ public class StudentListAdapter extends ArrayAdapter<Student> {
     private Activity context;
     private List<Student> studentList;
     private String subject;
+    Button yes;
+    Button no;
     public StudentListAdapter(Activity context, List<Student> studentList)
     {
         super(context, R.layout.studentlistlayout, studentList);
@@ -30,15 +34,18 @@ public class StudentListAdapter extends ArrayAdapter<Student> {
     public View getView(int position,  View convertView, ViewGroup parent) {
         LayoutInflater inflater = context.getLayoutInflater();
 
-        View listViewItem = inflater.inflate(R.layout.studentlistlayout, null, true);
+        final View listViewItem = inflater.inflate(R.layout.studentlistlayout, null, true);
 
         TextView textViewName = (TextView) listViewItem.findViewById(R.id.name);
         TextView textViewRoll = (TextView) listViewItem.findViewById(R.id.roll);
         TextView textViewPercent = (TextView) listViewItem.findViewById(R.id.percent);
         Student student = studentList.get(position);
 
+
         textViewName.setText(student.studentName);
         textViewRoll.setText(student.studentRollNumber);
+
+
 
 
         return  listViewItem;

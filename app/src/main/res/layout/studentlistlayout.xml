@@ -22,12 +22,10 @@
             android:layout_height="wrap_content"
             android:id="@+id/roll"
             android:layout_weight="1"/>
+
+
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/percent"
-        android:layout_weight="1"/>
+
 
 </LinearLayout>

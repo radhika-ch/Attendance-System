@@ -6,7 +6,12 @@ import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.GestureDetector;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -46,7 +51,7 @@ public class StudentList extends AppCompatActivity {
     int total;
     String num;
     Button stop;
-
+    StudentListAdapter adapter;
     String bluetoothAddress;
     BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -56,6 +61,9 @@ public class StudentList extends AppCompatActivity {
         setContentView(R.layout.activity_student_list);
         studentView = (ListView) findViewById(R.id.list);
         stop = (Button) findViewById(R.id.end);
+//        yes = (Button) findViewById(R.id.yes);
+//        no = (Button) findViewById(R.id.no);
+        registerForContextMenu(studentView);
 
 
 
@@ -67,6 +75,22 @@ public class StudentList extends AppCompatActivity {
             }
 
         }
+
+//        imageView.setOnTouchListener(new OnSwipeTouchListener(MyActivity.this) {
+//            public void onSwipeTop() {
+//                Toast.makeText(MyActivity.this, "top", Toast.LENGTH_SHORT).show();
+//            }
+//            public void onSwipeRight() {
+//                Toast.makeText(MyActivity.this, "right", Toast.LENGTH_SHORT).show();
+//            }
+//            public void onSwipeLeft() {
+//                Toast.makeText(MyActivity.this, "left", Toast.LENGTH_SHORT).show();
+//            }
+//            public void onSwipeBottom() {
+//                Toast.makeText(MyActivity.this, "bottom", Toast.LENGTH_SHORT).show();
+//            }
+//
+//        });
 
 
 
@@ -127,13 +151,13 @@ public class StudentList extends AppCompatActivity {
         minus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String n = number.getText().toString();
-                if(Integer.parseInt(n) <= 0)
+                num = number.getText().toString();
+                if(Integer.parseInt(num) <= 0)
                 {
                     Toast.makeText(getApplicationContext(), "Number of classes cannot be negative", Toast.LENGTH_LONG).show();
                 }
                 else
-                    number.setText(((Integer.parseInt(n))-1) + "");
+                    number.setText(((Integer.parseInt(num))-1) + "");
             }
         });
 
@@ -148,40 +172,86 @@ public class StudentList extends AppCompatActivity {
 //                i.putExtra("subject", subjectCode);
 //                i.putExtra("number", number.getText().toString());
 //                startActivity(i);
+                num = number.getText().toString();
+                if (num.equals("0"))
+                {
+                    Toast.makeText(getApplicationContext(), "You have not started the attendance", Toast.LENGTH_LONG).show();
+                }
+                else {
+                    DatabaseReference d = FirebaseDatabase.getInstance().getReference("Students");
+                    d.child(batch).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            ArrayList<Integer> randomArray = new ArrayList<Integer>();
 
 
-                DatabaseReference d = FirebaseDatabase.getInstance().getReference("Students");
-                d.child(batch).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        int max = 2;
-                        int min = 1;
-                        int random = new Random().nextInt((max - min) + 1) + min;
-                        Toast.makeText(getApplicationContext(), random+"", Toast.LENGTH_SHORT).show();
+                            int max = 2;
+                            int min = 1;
 
-                        for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren())
-                        {
-                            if(random > 0)
-                            {
-                                final int random1 = new Random().nextInt((1 - 0) + 1) + 0;
-                                if(random1 == 1)
-                                {
-                                  students.add(dataSnapshot1.getValue(Student.class));
-                                  random = random -1;
+                            for (int i = 0; i < 4; i++) {
+                                randomArray.add(0);
+                            }
+                            int random;
+                            int size = 2;
+                            while (size > 0) {
+                                random = new Random().nextInt((max - min) + 1) + min;
+                                //Toast.makeText(getApplicationContext(), "Random number is" + random + "", Toast.LENGTH_LONG).show();
+                                if (randomArray.get(random - 1) == 1) {
+                                    continue;
+                                } else {
+                                    randomArray.set(random - 1, 1);
+                                    // Toast.makeText(getApplicationContext(), random + "", Toast.LENGTH_LONG).show();
+                                    size = size - 1;
                                 }
                             }
+                            int i = 1;
+
+                            for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+
+                                Student student = dataSnapshot1.getValue(Student.class);
+                                Toast.makeText(getApplicationContext(), student.subjectMap.get(subjectCode).currentNumber + "", Toast.LENGTH_SHORT).show();
+
+                                if (student.subjectMap.get(subjectCode).currentNumber == 1) {
+                                    if (randomArray.get(i - 1) == 1) {
+                                        students.add(dataSnapshot1.getValue(Student.class));
+
+
+                                    }
+                                    i = i + 1;
+                                }
+
+                            }
+
+                            adapter = new StudentListAdapter(StudentList.this, students);
+                            studentView.setAdapter(adapter);
+//                        students.clear();
+
+//                       while(studentView.getAdapter().isEmpty() );
+//                        yes = (Button) studentView.findViewById(R.id.yes);
+//                        yes.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                View parentRow = (View) v.getParent();
+//                                ListView listView = (ListView) parentRow.getParent();
+//                                final int position = listView.getPositionForView(parentRow);
+//
+//                                students.remove(position);
+//                                adapter.notifyDataSetChanged();
+//
+//
+//
+//             }
+//                        });
+
+
                         }
 
-                        StudentListAdapter adapter = new StudentListAdapter(StudentList.this, students);
-                        studentView.setAdapter(adapter);
-//                        students.clear();
-                    }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+                        }
+                    });
+                }
 
 
 
@@ -257,7 +327,7 @@ public class StudentList extends AppCompatActivity {
                                             myref2.child(batch).child(student.studentRollNumber).setValue(student);
                                         }
 
-                                        number.setText("0");
+
                                     }
 
                                     @Override
@@ -395,4 +465,64 @@ public class StudentList extends AppCompatActivity {
         }
         return bluetoothMacAddress;
     }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.checkproxy, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+
+        switch (item.getItemId())
+        {
+            case R.id.present :
+                Student s = students.get(info.position);
+                students.remove(info.position);
+                adapter.notifyDataSetChanged();
+
+                return  true;
+
+            case R.id.absent :
+                final Student s1 = students.get(info.position);
+
+                final DatabaseReference d = FirebaseDatabase.getInstance().getReference("Students");
+                 d.child(batch).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot d1 : dataSnapshot.getChildren())
+                        {
+
+                            if(d1.getKey().equals(s1.studentRollNumber))
+                            {
+                                Student s2 = d1.getValue(Student.class);
+                                int present = s2.subjectMap.get(subjectCode).present;
+                                int total = s2.subjectMap.get(subjectCode).total;
+                                float percentage = s2.subjectMap.get(subjectCode).percentage;
+                                s2.subjectMap.get(subjectCode).present = s2.subjectMap.get(subjectCode).present + 5 +  Integer.parseInt(num);
+                                s2.subjectMap.get(subjectCode).percentage = ((float) present / (float) total) * 100;
+                                d.child(batch).child(s2.studentRollNumber).setValue(s2);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+                students.remove(info.position);
+                adapter.notifyDataSetChanged();
+
+                return  true;
+            default:
+                return super.onContextItemSelected(item);
+
+        }
+
+    }
+
 }
