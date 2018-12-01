@@ -209,9 +209,9 @@ public class StudentList extends AppCompatActivity {
                             for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
 
                                 Student student = dataSnapshot1.getValue(Student.class);
-                                Toast.makeText(getApplicationContext(), student.subjectMap.get(subjectCode).currentNumber + "", Toast.LENGTH_SHORT).show();
+                               // Toast.makeText(getApplicationContext(), student.subjectMap.get(subjectCode).currentNumber + "", Toast.LENGTH_SHORT).show();
 
-                                if (student.subjectMap.get(subjectCode).currentNumber == 1) {
+                                if (student.subjectMap.get(subjectCode).currentNumber == 0) {
                                     if (randomArray.get(i - 1) == 1) {
                                         students.add(dataSnapshot1.getValue(Student.class));
 
@@ -502,7 +502,7 @@ public class StudentList extends AppCompatActivity {
                                 int present = s2.subjectMap.get(subjectCode).present;
                                 int total = s2.subjectMap.get(subjectCode).total;
                                 float percentage = s2.subjectMap.get(subjectCode).percentage;
-                                s2.subjectMap.get(subjectCode).present = s2.subjectMap.get(subjectCode).present + 5 +  Integer.parseInt(num);
+                                s2.subjectMap.get(subjectCode).present = s2.subjectMap.get(subjectCode).present -  Integer.parseInt(num);
                                 s2.subjectMap.get(subjectCode).percentage = ((float) present / (float) total) * 100;
                                 d.child(batch).child(s2.studentRollNumber).setValue(s2);
                             }

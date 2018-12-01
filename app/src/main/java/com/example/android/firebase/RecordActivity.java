@@ -129,7 +129,6 @@ public class RecordActivity extends AppCompatActivity {
         emailView = (TextView) findViewById(R.id.email);
         rollNoView = (TextView) findViewById(R.id.rollNo);
         mDiscoverBtn = (Button) findViewById(R.id.discover);
-        logoutBtn = (Button) findViewById(R.id.logout);
         mAuth = FirebaseAuth.getInstance();
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -142,13 +141,6 @@ public class RecordActivity extends AppCompatActivity {
 
             }
         };
-        logoutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mAuth.signOut();
-                finish();
-            }
-        });
 
         // mBTArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
         mBTAdapter = BluetoothAdapter.getDefaultAdapter(); // get a handle on the bluetooth radio
@@ -213,13 +205,13 @@ public class RecordActivity extends AppCompatActivity {
                                 {
 
                                     Subject subject = subjectSnapshot.getValue(Subject.class);
-                                    Toast.makeText(getApplicationContext(), subject.subjectCode, Toast.LENGTH_SHORT).show();
+                                    //Toast.makeText(getApplicationContext(), subject.subjectCode, Toast.LENGTH_SHORT).show();
                                     String b = subject.batch;
                                     if(b.equals(batch))
                                     {
                                         subjects.add(subject.subjectCode);
                                         key = subject.subjectCode;
-                                        Toast.makeText(getApplicationContext(), subject.subjectCode + subject.total + "", Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(getApplicationContext(), subject.subjectCode + subject.total + "", Toast.LENGTH_SHORT).show();
 
                                         value = new studentSubject(key, 0, subject.total, 0, 0);
                                         subjectMap.put(key, value);
@@ -328,7 +320,7 @@ public class RecordActivity extends AppCompatActivity {
                 calendar = Calendar.getInstance();
                 Date date = calendar.getTime();
                 String day = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(date.getTime());
-                Toast.makeText(getApplicationContext(), day, Toast.LENGTH_SHORT).show();
+               // Toast.makeText(getApplicationContext(), day, Toast.LENGTH_SHORT).show();
 
 
 
@@ -403,19 +395,19 @@ public class RecordActivity extends AppCompatActivity {
                             subject.add(subjectCode);
                             start.add(startMins);
                             end.add(endMins);
-                            Toast.makeText(getApplicationContext(), startMins + " " + mins + " " + endMins, Toast.LENGTH_LONG).show();
+                          //  Toast.makeText(getApplicationContext(), startMins + " " + mins + " " + endMins, Toast.LENGTH_LONG).show();
 
                         }
                         for(int i=0; i<subject.size(); i++)
                         {
-                            Toast.makeText(getApplicationContext(), subject.get(i), Toast.LENGTH_LONG).show();
+                            //Toast.makeText(getApplicationContext(), subject.get(i), Toast.LENGTH_LONG).show();
 
                             if(start.get(i) <= mins && end.get(i) >=  mins)
                             {
                                 subjectCode = subject.get(i);
                                 sTime = start.get(i);
                                 eTime = end.get(i);
-                                Toast.makeText(getApplicationContext(), subject.get(i), Toast.LENGTH_LONG).show();
+                               // Toast.makeText(getApplicationContext(), subject.get(i), Toast.LENGTH_LONG).show();
                                 break;
 
                             }
@@ -433,14 +425,14 @@ public class RecordActivity extends AppCompatActivity {
                                         for(DataSnapshot bs : dataSnapshot.getChildren())
                                         {
                                             BluetoothAddress ba = bs.getValue(BluetoothAddress.class);
-                                            Toast.makeText(getApplicationContext(), "Subject is" + ba.subjectCode, Toast.LENGTH_SHORT).show();
+                                           // Toast.makeText(getApplicationContext(), "Subject is" + ba.subjectCode, Toast.LENGTH_SHORT).show();
 
                                             if(ba.subjectCode.equals(subjectCode)) {
                                                 String address = ba.address;
-                                                Toast.makeText(getApplicationContext(), subjectCode + address, Toast.LENGTH_SHORT).show();
+                                               // Toast.makeText(getApplicationContext(), subjectCode + address, Toast.LENGTH_SHORT).show();
 
                                                 if (device.getAddress().equals(address)) {
-                                                    Toast.makeText(getApplicationContext(), "FOUNDDD", Toast.LENGTH_SHORT).show();
+                                                    //Toast.makeText(getApplicationContext(), "FOUNDDD", Toast.LENGTH_SHORT).show();
 
                                                     currentSubject = subjectCode;
 
@@ -453,7 +445,7 @@ public class RecordActivity extends AppCompatActivity {
                                                                 if(student.studentRollNumber.equals(rollNumber)) {
                                                                     HashMap<String, studentSubject> subjectMap = student.subjectMap;
                                                                     studentSubject s = subjectMap.get(currentSubject);
-                                                                    Toast.makeText(getApplicationContext(), s.currentNumber + "", Toast.LENGTH_SHORT).show();
+                                                                   // Toast.makeText(getApplicationContext(), s.currentNumber + "", Toast.LENGTH_SHORT).show();
                                                                     if(s.currentNumber == 0)
                                                                     {
                                                                         Toast.makeText(getApplicationContext(), "You cannot mark your attendance right now", Toast.LENGTH_SHORT).show();
@@ -486,10 +478,7 @@ public class RecordActivity extends AppCompatActivity {
                                                     mBTAdapter.cancelDiscovery();
                                                 }
 
-                                                else
-                                                {
-                                                    Toast.makeText(getApplicationContext(), "You are not within the bluetooth range of your teacher's device", Toast.LENGTH_SHORT).show();
-                                                }
+
                                                 break;
                                             }
                                         }

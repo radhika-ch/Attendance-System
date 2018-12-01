@@ -48,7 +48,7 @@ public class PeriodActivity extends AppCompatActivity implements PeriodDialog.Pe
             if(b.getString("Batch") != null) {
                 batch = (String) b.getString("Batch");
                 day = (String) b.getString("Day");
-                Toast.makeText(getApplicationContext(), day, Toast.LENGTH_SHORT).show();
+              //  Toast.makeText(getApplicationContext(), day, Toast.LENGTH_SHORT).show();
             }
 
         }

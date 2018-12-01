@@ -34,7 +34,7 @@ public class AdminActivity extends AppCompatActivity {
 
         final GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         String name = acct.getDisplayName();
-        Toast.makeText(getApplicationContext(), name, Toast.LENGTH_SHORT).show();
+       // Toast.makeText(getApplicationContext(), name, Toast.LENGTH_SHORT).show();
 
         manageTeachers.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,7 +65,7 @@ public class AdminActivity extends AppCompatActivity {
                 for(DataSnapshot d : dataSnapshot.getChildren()){
                     if(d.hasChildren())
                     {
-                        Toast.makeText(getApplicationContext(), "HI", Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(getApplicationContext(), "HI", Toast.LENGTH_SHORT).show();
                         set = 0;
                         break;
                     }

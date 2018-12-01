@@ -57,10 +57,11 @@
         android:clickable="true"
         android:focusable="true"
         app:backgroundTint="@android:color/darker_gray"
-        app:srcCompat="@android:drawable/ic_input_add"
+        app:srcCompat="@drawable/plus"
         tools:layout_editor_absoluteX="328dp"
         tools:layout_editor_absoluteY="455dp"
-        android:background="@color/colorPrimary"/>
+        android:background="@color/colorPrimary"
+        android:paddingBottom="8dp"/>
     </RelativeLayout>
 
 
